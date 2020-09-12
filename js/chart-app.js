@@ -1,12 +1,12 @@
 class ChartApp{
     chartIds;
     chartTitles;
-    chartBackgroundColors;
 
     chartContainerId = '#charts-container';
     chartContainer;
 
     baseCharts = {};
+    datasets;
     //intake shopify created options and create charts
     constructor(options){
         try{
@@ -16,10 +16,8 @@ class ChartApp{
             this.buildChartElements();
             //will be dataset label
             this.chartTitles = options.chartTitles;
-            this.chartBackgroundColors = options.chartBackgroundColors;
-            this.chartBorderColors = options.chartBackgroundColors;
-            //array of arrays
-            this.allChartData = options.allChartData;
+            this.datasets = this.buildDatasets(options);
+            this.buildCharts(this.datasets,options);
             console.log('build charts');
         }
         catch(err){
@@ -28,17 +26,43 @@ class ChartApp{
         }
     }
 
-    buildCharts(){
-
+    buildCharts(datasets,options){
+        this.chartIds.forEach((id,i) => {
+            let chartOptions = {
+                chartId:id,
+                labels:options.dataLabels[i],
+                type:options.types[i],
+                datasets:datasets[i]
+            };
+            let newChart = new BaseChart(chartOptions);
+            this.baseCharts[id] = newChart;
+        });
     }
 
     buildChartElements(){
         this.chartIds.forEach(id => {
-            let chartDiv = $(`<div class="col-lg-3"><canvas id=${id}</div>`);
+            let chartDiv = $(`<div class="col-lg-3">
+            <canvas id=${id}></canvas>
+            </div>`);
             $(this.chartContainer).append(chartDiv);
         });
     }
 
+    buildDatasets(options){
+        let datasets = [];
+
+        this.chartIds.forEach((id,i) => {
+            let dataset = [{}];
+            dataset[0].label = options.chartTitles[i];
+            dataset[0].backgroundColor = options.chartColors[i];
+            dataset[0].borderColor = options.borderColors[i];
+            dataset[0].borderWidth = options.borderWidths[i];
+            dataset[0].data = options.allChartData[i];
+            datasets.push(dataset);
+        });
+
+        return datasets;
+    }
 
     cleanData(){
 

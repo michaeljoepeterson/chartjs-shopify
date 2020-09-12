@@ -10,7 +10,6 @@ class BaseChart{
         options:{}
     };
 
-    options = {};
     colorKey = 'color';
     chartId;
     chart;
@@ -20,8 +19,10 @@ class BaseChart{
             try{
                 this.chartOptions.type = options.type;
                 this.chartOptions.data.labels = options.labels;
-                this.chartOptions.data.datasets = this.buildDatasets(options.datasets);
+                this.chartOptions.data.datasets = options.datasets;
                 this.chartId = options.chartId;
+                //debugger;
+                this.chartOptions.options = this.addDefaultOptions(options);
                 this.buildChart();
             }
             catch(err){
@@ -34,20 +35,50 @@ class BaseChart{
         let datasets = [{}];
 
         for(let option in datasetOptions){
-            if(option.toLowerCase().includes(this.colorKey)){
-                if(datasetOptions[option].length === 1){
-                    datasets[0][option] = datasetOptions[option][0];
+            if(datasetOptions[option]){
+                if(option.toLowerCase().includes(this.colorKey)){
+                    if(datasetOptions[option].length === 1){
+                        datasets[0][option] = datasetOptions[option][0];
+                    }
                 }
+                datasets[0][option] = datasetOptions[option];
             }
-            datasets[0][option] = datasetOptions[option];
         }
 
         return datasets;
     }
 
     buildChart(){
-        let ctx = document.getElementById(this.chartId).getContext('2d');
+        let canvas = document.getElementById(this.chartId);
+        let ctx = canvas.getContext('2d');
         this.chart = new Chart(ctx, this.chartOptions);
+    }
+
+    addDefaultOptions(options){
+        //eventually could do this to store chart default options
+        const noAxis = {
+            radar:false,
+            pie:false,
+            doughnut:false,
+            line:true,
+            bar:true
+        };
+        let beginAtZero = noAxis[options.type];
+        let defaultOptions = {};
+        if(beginAtZero){
+            defaultOptions = {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: beginAtZero
+                        }
+                    }]
+                }
+            };
+
+        }
+  
+        return defaultOptions;
     }
 
 }
