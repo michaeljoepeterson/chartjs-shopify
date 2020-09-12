@@ -87,9 +87,10 @@ var chart = new Chart(ctx, {
 
 function initApp(){
     let options = {
-        chartTitles:['']
+        chartTitles:['First Chart','My Second Chart','The Third Chart','Wage Data'],
+        allChartData:[]
     };
-    let chartApp = new ChartApp();
+    let chartApp = new ChartApp(options);
 }
 
 $(initApp);
